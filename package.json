@@ -1,0 +1,43 @@
+{
+  "name": "@mogoe1/semaphore",
+  "version": "1.0.0",
+  "description": "A semaphore designed for multithreaded browser environments",
+  "main": "lib/Semaphore.js",
+  "types": "lib/Semaphore.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint ./src/**",
+    "lint:fix": "eslint ./src/** --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mogoe1/semaphore.git"
+  },
+  "keywords": [
+    "Browser",
+    "Thread",
+    "WebWorker",
+    "Semaphore",
+    "Atomics",
+    "SharedArrayBuffer"
+  ],
+  "author": "Moritz Goertz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mogoe1/semaphore/issues"
+  },
+  "homepage": "https://github.com/mogoe1/semaphore#readme",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.17.0",
+    "@typescript-eslint/parser": "^4.17.0",
+    "eslint": "^7.31.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.3.1",
+    "typescript": "^4.3.5"
+  },
+  "files": [
+    "lib/**/*"
+  ]
+}
