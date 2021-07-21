@@ -1,11 +1,12 @@
 {
   "name": "@mogoe1/semaphore",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A semaphore designed for multithreaded browser environments",
   "main": "lib/Semaphore.js",
   "types": "lib/Semaphore.d.ts",
   "scripts": {
     "build": "tsc",
+    "doc": "typedoc --packages . --theme minimal --includeVersion",
     "lint": "eslint ./src/**",
     "lint:fix": "eslint ./src/** --fix"
   },
@@ -35,6 +36,7 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
+    "typedoc": "^0.21.4",
     "typescript": "^4.3.5"
   },
   "files": [
