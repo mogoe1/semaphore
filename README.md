@@ -1,6 +1,10 @@
-# semaphore
+# Semaphore
+A semaphore designed for multi-threaded browser environments.
 
-test
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbNDU0NDA2Njk5XX0=
--->
+## Installing
+	npm install @mogoe1/semaphore
+
+## Quickstart
+
+## Docs
+Please see the `docs` folder.
