@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>@mogoe1/semaphore - v0.1.0 | @mogoe1/semaphore - v0.1.0</title>
-	<meta name="description" content="Documentation for @mogoe1/semaphore - v0.1.0">
+	<title>@mogoe1/semaphore - v0.1.2 | @mogoe1/semaphore - v0.1.2</title>
+	<meta name="description" content="Documentation for @mogoe1/semaphore - v0.1.2">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style type="text/css">:root {
   --color-background: #fdfdfd;
@@ -2674,7 +2674,7 @@ img {
 		<div class="container">
 			<div class="table-wrap">
 				<div class="table-cell">
-					<strong><a href="index.html">@mogoe1/semaphore - v0.1.0</a></strong>
+					<strong><a href="index.html">@mogoe1/semaphore - v0.1.2</a></strong>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -2719,17 +2719,48 @@ img {
 			<a href="#installing" id="installing" style="color: inherit; text-decoration: none;">
 				<h2>Installing</h2>
 			</a>
-			<pre><code><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span><span style="color: #000000"> @</span><span style="color: #001080">mogoe1</span><span style="color: #000000">/</span><span style="color: #001080">semaphore</span>
+			<p><strike> <code>npm install @mogoe1/semaphore</code> </strike> (we are not on npm yet)</p>
+			<pre><code><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span><span style="color: #000000"> </span><span style="color: #001080">git</span><span style="color: #000000">+https:</span><span style="color: #008000">//github.com/mogoe1/semaphore.git</span>
 </code></pre>
+			<a href="#notes" id="notes" style="color: inherit; text-decoration: none;">
+				<h2>Notes</h2>
+			</a>
+			<ul>
+				<li>The implementation relies on SharedArrayBuffers. Make sure your site meets the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer#security_requirements">security requirements</a>.</li>
+				<li>The implementation relies on Atomics.waitAsync which is implemented by <a href="https://v8.dev/features/atomics">v8</a> but not documented at mdn yet. You might want to proivide a <a href="https://github.com/tc39/proposal-atomics-wait-async/blob/master/polyfill.js">polyfill</a>.</li>
+			</ul>
 			<a href="#quickstart" id="quickstart" style="color: inherit; text-decoration: none;">
 				<h2>Quickstart</h2>
 			</a>
-			<pre><code><span style="color: #001080">example</span><span style="color: #000000"> </span><span style="color: #001080">here</span>
+			<p>The following example shows how a samaphore can be used to make sure only one thrad at a time has access to a shared ressource.</p>
+			<pre><code class="language-js"><span style="color: #008000">// file: main.js</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">Semaphore</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;@mogoe1/semaphore&quot;</span><span style="color: #000000">;</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">sem</span><span style="color: #000000"> = </span><span style="color: #001080">Semaphore</span><span style="color: #000000">.</span><span style="color: #795E26">createWithCapacity</span><span style="color: #000000">(</span><span style="color: #098658">1</span><span style="color: #000000">);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">worker</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Worker</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;worker.js&quot;</span><span style="color: #000000">, {</span><span style="color: #001080">type:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;module&quot;</span><span style="color: #000000">});</span>
+
+<span style="color: #001080">worker</span><span style="color: #000000">.</span><span style="color: #795E26">postMessage</span><span style="color: #000000">(</span><span style="color: #001080">sem</span><span style="color: #000000">.</span><span style="color: #001080">buffer</span><span style="color: #000000">);</span>
+
+<span style="color: #001080">sem</span><span style="color: #000000">.</span><span style="color: #795E26">acquireAsync</span><span style="color: #000000">(</span><span style="color: #098658">1</span><span style="color: #000000">).</span><span style="color: #795E26">then</span><span style="color: #000000">(</span><span style="color: #001080">_</span><span style="color: #0000FF">=&gt;</span><span style="color: #000000">{</span>
+<span style="color: #000000">    </span><span style="color: #008000">// exclusive access to resource</span>
+<span style="color: #000000">    </span><span style="color: #001080">sem</span><span style="color: #000000">.</span><span style="color: #795E26">release</span><span style="color: #000000">(</span><span style="color: #098658">1</span><span style="color: #000000">);</span>
+<span style="color: #000000">});</span>
+</code></pre>
+			<pre><code class="language-js"><span style="color: #008000">// file: worker.js</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">Semaphore</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;@mogoe1/semaphore&quot;</span><span style="color: #000000">;</span>
+
+<span style="color: #001080">self</span><span style="color: #000000">.</span><span style="color: #795E26">addEventListener</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;message&quot;</span><span style="color: #000000">, </span><span style="color: #001080">message</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">buffer</span><span style="color: #000000"> = </span><span style="color: #001080">message</span><span style="color: #000000">.</span><span style="color: #001080">data</span><span style="color: #000000">;</span>
+<span style="color: #000000">    </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">sem</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Semaphore</span><span style="color: #000000">(</span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Int32Array</span><span style="color: #000000">(</span><span style="color: #001080">buffer</span><span style="color: #000000">));</span>
+<span style="color: #000000">    </span><span style="color: #001080">sem</span><span style="color: #000000">.</span><span style="color: #795E26">acquire</span><span style="color: #000000">(</span><span style="color: #098658">1</span><span style="color: #000000">); </span><span style="color: #008000">// this blocks the worker thread untill one permit is acquired!</span>
+<span style="color: #000000">    </span><span style="color: #008000">// exclusive access to resource</span>
+<span style="color: #000000">    </span><span style="color: #001080">sem</span><span style="color: #000000">.</span><span style="color: #795E26">release</span><span style="color: #000000">(</span><span style="color: #098658">1</span><span style="color: #000000">);</span>
+<span style="color: #000000">});</span>
 </code></pre>
 			<a href="#docs" id="docs" style="color: inherit; text-decoration: none;">
 				<h2>Docs</h2>
 			</a>
-			<p>Please see the <code>docs</code> folder.</p>
+			<p>Docs are availabe at <a href="https://mogoe1.github.io/semaphore/index.html">https://mogoe1.github.io/semaphore/index.html</a>.</p>
 		</div>
 		<div style="position:relative;"><a name="typedoc-main-index" class="tsd-anchor"></a></div>
 		<section class="tsd-panel-group tsd-index-group">

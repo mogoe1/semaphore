@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Semaphore | @mogoe1/semaphore - v0.1.0</title>
-	<meta name="description" content="Documentation for @mogoe1/semaphore - v0.1.0">
+	<title>Semaphore | @mogoe1/semaphore - v0.1.2</title>
+	<meta name="description" content="Documentation for @mogoe1/semaphore - v0.1.2">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style type="text/css">:root {
   --color-background: #fdfdfd;
@@ -2674,7 +2674,7 @@ img {
 		<div class="container">
 			<div class="table-wrap">
 				<div class="table-cell">
-					<strong><a href="../index.html">@mogoe1/semaphore - v0.1.0</a></strong>
+					<strong><a href="../index.html">@mogoe1/semaphore - v0.1.2</a></strong>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -2722,6 +2722,9 @@ img {
 				<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 					<a href="Semaphore.html#availablePermits" class="tsd-kind-icon">available<wbr>Permits</a>
 				</li>
+				<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+					<a href="Semaphore.html#buffer" class="tsd-kind-icon">buffer</a>
+				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
 					<a href="Semaphore.html#acquire" class="tsd-kind-icon">acquire</a>
 				</li>
@@ -2732,7 +2735,7 @@ img {
 					<a href="Semaphore.html#release" class="tsd-kind-icon">release</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
-					<a href="Semaphore.html#fromCapacity" class="tsd-kind-icon">from<wbr>Capacity</a>
+					<a href="Semaphore.html#createWithCapacity" class="tsd-kind-icon">create<wbr>With<wbr>Capacity</a>
 				</li>
 			</ul>
 		</li>
@@ -2743,9 +2746,12 @@ img {
 		<section class="tsd-panel tsd-comment">
 			<div class="tsd-comment tsd-typography">
 				<div class="lead">
-					<p>A semaphore based on a {@link SharedArrayBuffer}.</p>
+					<p>Conceptually a smaphore can be used to manage a set of permits across different thrads.
+						The semaphore keeps track of how many permits are available. Each call to <a href="Semaphore.html#acquire">acquire()</a> blocks untill enough permits are available and takes all at once.
+					No longer needed permits can be released by calling <a href="Semaphore.html#release">release()</a>. This notifies blocked <a href="Semaphore.html#acquire">acquire()</a> calls.</p>
 				</div>
-				<p>&quot;Conceptually, a semaphore maintains a set of permits. Each acquire() blocks if necessary until a permit is available, and then takes it. Each release() adds a permit, potentially releasing a blocking acquirer. However, no actual permit objects are used; the Semaphore just keeps a count of the number available and acts accordingly.&quot; [<a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Semaphore.html" class="external">docs.oracle.com</a>]</p>
+				<p>This implementation uses Atomics and a SharedArrayBuffer which holds the number of availabe permits.
+				To use a semaphore across multiple WebWorkers the SharedArrayBuffer can be shared to the Worker instances.</p>
 			</div>
 		</section>
 		<section class="tsd-panel tsd-hierarchy">
@@ -2778,6 +2784,7 @@ img {
 						<ul class="tsd-index-list">
 							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="Semaphore.html#acquiredPermits" class="tsd-kind-icon">acquired<wbr>Permits</a></li>
 							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="Semaphore.html#availablePermits" class="tsd-kind-icon">available<wbr>Permits</a></li>
+							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="Semaphore.html#buffer" class="tsd-kind-icon">buffer</a></li>
 						</ul>
 					</section>
 					<section class="tsd-index-section ">
@@ -2786,7 +2793,7 @@ img {
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="Semaphore.html#acquire" class="tsd-kind-icon">acquire</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="Semaphore.html#acquireAsync" class="tsd-kind-icon">acquire<wbr>Async</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="Semaphore.html#release" class="tsd-kind-icon">release</a></li>
-							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="Semaphore.html#fromCapacity" class="tsd-kind-icon">from<wbr>Capacity</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="Semaphore.html#createWithCapacity" class="tsd-kind-icon">create<wbr>With<wbr>Capacity</a></li>
 						</ul>
 					</section>
 				</div>
@@ -2804,12 +2811,12 @@ img {
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/a221fc1/src/Semaphore.ts#L14">Semaphore.ts:14</a></li>
+								<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/402741b/src/Semaphore.ts#L25">Semaphore.ts:25</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 							<div class="lead">
-								<p>Create a new Semaphore</p>
+								<p>Creates a new semaphore object. The given Int32Array should be based on a SharedArrayBuffer, have length one and hold the number of currently availaber permits.</p>
 							</div>
 						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
@@ -2818,7 +2825,7 @@ img {
 								<h5>int32Array: <span class="tsd-signature-type">Int32Array</span></h5>
 								<div class="tsd-comment tsd-typography">
 									<div class="lead">
-										<p>TypedArray that is based on a {@link SharedArrayBuffer} with length one.</p>
+										<p>The typed array which holds the number of availabe permits. It has to have length of one and it has to be based of a SharedArrayBuffer.</p>
 									</div>
 								</div>
 							</li>
@@ -2836,9 +2843,14 @@ img {
 				<div class="tsd-signature tsd-kind-icon">_acquired<wbr>Permits<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/a221fc1/src/Semaphore.ts#L7">Semaphore.ts:7</a></li>
+						<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/402741b/src/Semaphore.ts#L13">Semaphore.ts:13</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Number of permits accuired by this instance.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
 				<a name="_int32Array" class="tsd-anchor"></a>
@@ -2846,9 +2858,14 @@ img {
 				<div class="tsd-signature tsd-kind-icon">_int32<wbr>Array<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Int32Array</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/a221fc1/src/Semaphore.ts#L8">Semaphore.ts:8</a></li>
+						<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/402741b/src/Semaphore.ts#L18">Semaphore.ts:18</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The typed array which holds the number of availabe permits.</p>
+					</div>
+				</div>
 			</section>
 		</section>
 		<section class="tsd-panel-group tsd-member-group ">
@@ -2863,12 +2880,12 @@ img {
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/a221fc1/src/Semaphore.ts#L29">Semaphore.ts:29</a></li>
+								<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/402741b/src/Semaphore.ts#L40">Semaphore.ts:40</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 							<div class="lead">
-								<p>Number of permits acquired by this semaphore object</p>
+								<p>Number of permits acquired by this instance.</p>
 							</div>
 						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -2885,15 +2902,37 @@ img {
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/a221fc1/src/Semaphore.ts#L36">Semaphore.ts:36</a></li>
+								<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/402741b/src/Semaphore.ts#L47">Semaphore.ts:47</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 							<div class="lead">
-								<p>Number of currently available permits</p>
+								<p>Number of currently available permits.</p>
 							</div>
 						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+				<a name="buffer" class="tsd-anchor"></a>
+				<h3>buffer</h3>
+				<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+					<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> buffer<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SharedArrayBuffer</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/402741b/src/Semaphore.ts#L54">Semaphore.ts:54</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>SharedArrayBuffer used by this semaphore.</p>
+							</div>
+						</div>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">SharedArrayBuffer</span></h4>
 					</li>
 				</ul>
 			</section>
@@ -2910,12 +2949,12 @@ img {
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/a221fc1/src/Semaphore.ts#L44">Semaphore.ts:44</a></li>
+								<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/402741b/src/Semaphore.ts#L63">Semaphore.ts:63</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 							<div class="lead">
-								<p>Acquires the given number of permits from this semaphore, blocking until all are available.</p>
+								<p>Acquires a given number of permits from the semaphore. The call blocks untill enough permits are available and acquires all at once.</p>
 							</div>
 						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
@@ -2941,14 +2980,14 @@ img {
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/a221fc1/src/Semaphore.ts#L88">Semaphore.ts:88</a></li>
+								<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/402741b/src/Semaphore.ts#L110">Semaphore.ts:110</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 							<div class="lead">
-								<p>Acquires the given number of permits from this semaphore. The promise returned by this function resolves once all are available.
-								This should be used in favor of <a href="Semaphore.html#acquire">Semaphore.acquire</a> if {@link Atomics.wait} is not available (eg. on the main thread).</p>
+								<p>Acquires a given number of permits from the semaphore. Calls to the function do not block like calls to <a href="Semaphore.html#acquire">acquire</a> but immediately return with a promise. The promise resolves once all permis a available and acquired.</p>
 							</div>
+							<p>This should be used in favor of <a href="Semaphore.html#acquire">acquire</a> if Atomics.wait is not available (eg. on the main thread).</p>
 						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
@@ -2960,6 +2999,7 @@ img {
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						<p>A promise that resolves once all permits are acquired.</p>
 					</li>
 				</ul>
 			</section>
@@ -2973,12 +3013,12 @@ img {
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/a221fc1/src/Semaphore.ts#L67">Semaphore.ts:67</a></li>
+								<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/402741b/src/Semaphore.ts#L87">Semaphore.ts:87</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 							<div class="lead">
-								<p>Releases the given number of permits, returning them to the semaphore.</p>
+								<p>Releases the given number of permits and returns them to the semaphore. It automatically notifies blocked <a href="Semaphore.html#acquire">acuire()</a> and pending <a href="Semaphore.html#acquireAsync">acquireAsync()</a> calls.</p>
 							</div>
 						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
@@ -2995,27 +3035,27 @@ img {
 				</ul>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
-				<a name="fromCapacity" class="tsd-anchor"></a>
-				<h3><span class="tsd-flag ts-flagStatic">Static</span> from<wbr>Capacity</h3>
+				<a name="createWithCapacity" class="tsd-anchor"></a>
+				<h3><span class="tsd-flag ts-flagStatic">Static</span> create<wbr>With<wbr>Capacity</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
-					<li class="tsd-signature tsd-kind-icon">from<wbr>Capacity<span class="tsd-signature-symbol">(</span>permits<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="Semaphore.html" class="tsd-signature-type" data-tsd-kind="Class">Semaphore</a></li>
+					<li class="tsd-signature tsd-kind-icon">create<wbr>With<wbr>Capacity<span class="tsd-signature-symbol">(</span>capacity<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="Semaphore.html" class="tsd-signature-type" data-tsd-kind="Class">Semaphore</a></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/a221fc1/src/Semaphore.ts#L109">Semaphore.ts:109</a></li>
+								<li>Defined in <a href="https://github.com/mogoe1/semaphore/blob/402741b/src/Semaphore.ts#L131">Semaphore.ts:131</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 							<div class="lead">
-								<p>Creates a new Semaphore holding a specified number of permits</p>
+								<p>Creates a new Semaphore initially holding the specified number of permits.</p>
 							</div>
 						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
-								<h5>permits: <span class="tsd-signature-type">number</span></h5>
+								<h5>capacity: <span class="tsd-signature-type">number</span></h5>
 								<div class="tsd-comment tsd-typography">
 									<p>Intially availabe permits</p>
 								</div>
