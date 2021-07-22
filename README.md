@@ -4,7 +4,7 @@ A semaphore designed for multi-threaded browser environments.
 ## Installing
 <strike> `npm install @mogoe1/semaphore` </strike> (we are not on npm yet)
 
-	npm install git+https://github.com/mogoe1/semaphore.git
+	npm install --save git+https://github.com/mogoe1/semaphore.git
 
 ## Notes
 * The implementation relies on SharedArrayBuffers. Make sure your site meets the [security requirements](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer#security_requirements).
