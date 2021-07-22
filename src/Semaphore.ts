@@ -38,8 +38,11 @@ export class Semaphore {
     }
 
     /**
-     * Acquires the given number of permits from this semaphore, blocking until all are available.
-     * @param num Number of permits to acquire.
+     * SharedArrayBuffer used by this semaphore.
+     */
+    public get buffer(): SharedArrayBuffer {
+        return this._int32Array.buffer as SharedArrayBuffer;
+    }
      */
     public acquire(num = 1): void {
         if (num <= 0) {
