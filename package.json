@@ -9,7 +9,8 @@
     "docs:build": "npm run build && typedoc --packages . --theme minimal --includeVersion",
     "docs:publish": "git add -f docs && git stash && git checkout doc && git restore -s stash@{0} -- docs && git commit docs -m 'Updated documentation'; git push && git checkout develop && git stash pop && git restore --staged docs",
     "lint": "eslint ./src/**",
-    "lint:fix": "eslint ./src/** --fix"
+    "lint:fix": "eslint ./src/** --fix",
+    "prepare" : "npm run build"
   },
   "repository": {
     "type": "git",
