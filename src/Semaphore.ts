@@ -125,12 +125,12 @@ export class Semaphore {
 
     /**
      * Creates a new Semaphore initially holding the specified number of permits.
-     * @param permits Intially availabe permits
+     * @param capacity - Intially availabe permits
      * @returns {Semaphore}
      */
-    public static fromCapacity(permits: number): Semaphore {
+    public static createWithCapacity(capacity: number): Semaphore {
         const sab = new SharedArrayBuffer(4);
-        new DataView(sab).setInt32(0, permits, true);
+        new DataView(sab).setInt32(0, capacity, true);
         return new Semaphore(new Int32Array(sab));
     }
 }
