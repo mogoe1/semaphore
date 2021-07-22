@@ -1,6 +1,6 @@
 {
   "name": "@mogoe1/semaphore",
-  "version": "2.0.0",
+  "version": "0.1.2",
   "description": "A semaphore designed for multithreaded browser environments",
   "main": "lib/Semaphore.js",
   "types": "lib/Semaphore.d.ts",
