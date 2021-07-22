@@ -58,7 +58,7 @@ export class Semaphore {
     /**
      * Acquires a given number of permits from the semaphore. The call blocks untill enough permits are available and acquires all at once.
      * 
-     * @param num - Number of permits to acquire.
+     * @param num Number of permits to acquire.
      */
     public acquire(num = 1): void {
         if (num <= 0) {
@@ -82,7 +82,7 @@ export class Semaphore {
     /**
      * Releases the given number of permits and returns them to the semaphore. It automatically notifies blocked {@link Semaphore.acquire acuire()} and pending {@link Semaphore.acquireAsync acquireAsync()} calls.
      * 
-     * @param num - Number of permits to release
+     * @param num Number of permits to release
      */
     public release(num = 1): void {
         if (num > this._acquiredPermits) {
@@ -105,7 +105,7 @@ export class Semaphore {
      * This should be used in favor of {@link Semaphore.acquire acquire} if Atomics.wait is not available (eg. on the main thread).
      * 
      * @param num Number of permits to acquire.
-     * @returns {Promise<void>} - A promise that resolves once all permits are acquired. 
+     * @returns {Promise<void>} A promise that resolves once all permits are acquired. 
      */
     public async acquireAsync(num = 1): Promise<void> {
         while (true) {
@@ -125,7 +125,7 @@ export class Semaphore {
 
     /**
      * Creates a new Semaphore initially holding the specified number of permits.
-     * @param capacity - Intially availabe permits
+     * @param capacity Intially availabe permits
      * @returns {Semaphore}
      */
     public static createWithCapacity(capacity: number): Semaphore {
