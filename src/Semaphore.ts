@@ -20,7 +20,7 @@ export class Semaphore {
     /**
      * Creates a new semaphore object. The given Int32Array should be based on a SharedArrayBuffer, have length one and hold the number of currently availaber permits.
      * 
-     * @param int32Array The typed array which holds the number of availabe permits. It has to have length of one and it has to be based of a SharedArrayBuffer.
+     * @param int32Array The typed array which holds the number of availabe permits. It has to have length of one and it has to be based on a SharedArrayBuffer.
      */
     constructor(int32Array: Int32Array) {
         if (!(int32Array.buffer instanceof SharedArrayBuffer)) {
@@ -125,7 +125,7 @@ export class Semaphore {
 
     /**
      * Creates a new Semaphore initially holding the specified number of permits.
-     * @param capacity Intially availabe permits
+     * @param capacity Intially availabe number of permits
      * @returns {Semaphore}
      */
     public static createWithCapacity(capacity: number): Semaphore {
