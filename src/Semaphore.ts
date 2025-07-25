@@ -1,28 +1,36 @@
+import { TimeoutError } from "./TimeoutError";
+
 /**
- * Conceptually a smaphore can be used to manage a set of permits across different thrads.
- * The semaphore keeps track of how many permits are available. Each call to {@link Semaphore.acquire acquire()} blocks untill enough permits are available and takes all at once.
- * No longer needed permits can be released by calling {@link Semaphore.release release()}. This notifies blocked {@link Semaphore.acquire acquire()} calls.
+ * A semaphore is a concurrency primitive used to manage a limited number of permits shared across multiple threads.
  * 
- * This implementation uses Atomics and a SharedArrayBuffer which holds the number of availabe permits.
- * To use a semaphore across multiple WebWorkers the SharedArrayBuffer can be shared to the Worker instances.
+ * The semaphore keeps track of how many permits are currently available. Each call to {@link Semaphore.acquire acquire()} blocks until the required number of permits is available and then acquires them all at once.
+ * 
+ * Permits that are no longer needed can be released by calling {@link Semaphore.release release()}, which notifies any blocked {@link Semaphore.acquire acquire()} or pending {@link Semaphore.acquireAsync acquireAsync()} calls.
+ * 
+ * This implementation uses `Atomics` and a `SharedArrayBuffer` to store the number of available permits.
+ * To share a semaphore across multiple WebWorkers, pass the underlying `SharedArrayBuffer` to the workers.
  */
 export class Semaphore {
     /**
-     * Number of permits accuired by this instance.
-     */
-    private _acquiredPermits: number;
-
-    /**
-     * The typed array which holds the number of availabe permits.
+     * The typed array which holds the number of available permits.
      */
     private _int32Array: Int32Array;
 
     /**
-     * Creates a new semaphore object. The given Int32Array should be based on a SharedArrayBuffer, have length one and hold the number of currently availaber permits.
-     * 
-     * @param int32Array The typed array which holds the number of availabe permits. It has to have length of one and it has to be based on a SharedArrayBuffer.
+     * Returns the number of permits currently available in the semaphore.
      */
-    constructor(int32Array: Int32Array) {
+    public get availablePermits(): number {
+        return Atomics.load(this._int32Array, 0);
+    }
+
+    /**
+     * Creates a new semaphore object.
+     * 
+     * @param int32Array A `Int32Array` with length 1 (4 bytes) backed by a `SharedArrayBuffer`, used to track available permits.
+     * @throws {TypeError} If the array is not backed by a `SharedArrayBuffer`.
+     * @throws {Error} If the array does not have a length of 1.
+     */
+    private constructor(int32Array: Int32Array) {
         if (!(int32Array.buffer instanceof SharedArrayBuffer)) {
             throw new TypeError(`${int32Array} is not a shared typed array`);
         }
@@ -30,69 +38,99 @@ export class Semaphore {
             throw new Error(`${int32Array} does not have length 1`);
         }
 
-        this._acquiredPermits = 0;
         this._int32Array = int32Array;
     }
 
     /**
-     * Number of permits acquired by this instance.
-     */
-    public get acquiredPermits(): number {
-        return this._acquiredPermits;
-    }
-
-    /**
-     * Number of currently available permits.
-     */
-    public get availablePermits(): number {
-        return Atomics.load(this._int32Array, 0);
-    }
-
-    /**
-     * SharedArrayBuffer used by this semaphore.
-     */
-    public get buffer(): SharedArrayBuffer {
-        return this._int32Array.buffer as SharedArrayBuffer;
-    }
-
-    /**
-     * Acquires a given number of permits from the semaphore. The call blocks untill enough permits are available and acquires all at once.
+     * Acquires the specified number of permits from the semaphore.
+     * This method blocks until the requested number of permits becomes available.
      * 
-     * @param num Number of permits to acquire.
+     * @param num The number of permits to acquire. Must be greater than 0.
+     * @param timeoutMs Optional timeout in milliseconds. If exceeded, a {@link TimeoutError} is thrown.
+     * @throws {Error} If `num` is less than or equal to 0.
+     * @throws {TimeoutError} If the timeout expires before the permits are acquired.
      */
-    public acquire(num = 1): void {
+    public acquire(num: number = 1, timeoutMs: number | undefined = undefined): void {
         if (num <= 0) {
             throw new Error("num may not be equal to or less than zero");
         }
 
+        if (timeoutMs < 0) {
+            throw new Error("timeout may not be equal to or less than zero");
+        }
+        const startTime: number = performance.now();
+
         while (true) {
-            const available = Atomics.load(this._int32Array, 0);
+            const availableTime: number = timeoutMs !== undefined ? timeoutMs - (performance.now() - startTime) : undefined;
+            const available: number = Atomics.load(this._int32Array, 0);
+
             if (available < num) {
-                Atomics.wait(this._int32Array, 0, available); // wait untill the value changes
+                const result: string | null = Atomics.wait(this._int32Array, 0, available, availableTime); // wait until the value changes
+                if (result === "timed-out") {
+                    throw new TimeoutError();
+                }
                 continue; // and try again
             }
 
             if (Atomics.compareExchange(this._int32Array, 0, available, available - num) === available) {
-                this._acquiredPermits += num;
                 break;
             }
         }
     }
 
     /**
-     * Releases the given number of permits and returns them to the semaphore. It automatically notifies blocked {@link Semaphore.acquire acuire()} and pending {@link Semaphore.acquireAsync acquireAsync()} calls.
-     * 
-     * @param num Number of permits to release
-     */
-    public release(num = 1): void {
-        if (num > this._acquiredPermits) {
-            throw new Error("Amount to release is greater than the amount acquired");
+    * Asynchronously acquires the specified number of permits from the semaphore.
+    * This method returns a promise that resolves once the requested number of permits is available and acquired.
+    * 
+    * This method is recommended on platforms where `Atomics.wait` is not available (e.g., in the main thread).
+    * 
+    * @param num The number of permits to acquire. Must be greater than 0.
+    * @param timeoutMs Optional timeout in milliseconds. If exceeded, a {@link TimeoutError} is thrown.
+    * @returns A promise that resolves when the requested number of permits has been acquired.
+    * @throws {Error} If `num` is less than or equal to 0.
+    * @throws {TimeoutError} If the timeout expires before the permits are acquired.
+    */
+    public async acquireAsync(num: number = 1, timeoutMs: number | undefined = undefined): Promise<void> {
+        if (num <= 0) {
+            throw new Error("num may not be equal to or less than zero");
         }
 
+        if ((timeoutMs ?? 0) < 0) {
+            throw new Error("timeout may not be equal to or less than zero");
+        }
+        const startTime: number = performance.now();
+
         while (true) {
-            const available = Atomics.load(this._int32Array, 0);
+            const availableTime: number = timeoutMs !== undefined ? timeoutMs - (performance.now() - startTime) : undefined;
+            const available: number = Atomics.load(this._int32Array, 0);
+
+            if (available < num) {
+                const result: { async: boolean; value: string | null } = Atomics.waitAsync(this._int32Array, 0, available, availableTime); // wait until the value changes
+                if (!result.async && result.value === "timed-out") {
+                    throw new TimeoutError();
+                }
+                if (result.async && await result.value === "timed-out") {
+                    throw new TimeoutError();
+                }
+                continue; // and try again
+            }
+
+            if (Atomics.compareExchange(this._int32Array, 0, available, available - num) === available) {
+                break;
+            }
+        }
+    }
+
+    /**
+     * Releases the specified number of permits and returns them to the semaphore.
+     * Notifies any blocked or pending acquire calls.
+     * 
+     * @param num The number of permits to release. Must not exceed the number of currently held permits.
+     */
+    public release(num: number = 1): void {
+        while (true) {
+            const available: number = Atomics.load(this._int32Array, 0);
             if (Atomics.compareExchange(this._int32Array, 0, available, available + num) === available) {
-                this._acquiredPermits -= num;
                 Atomics.notify(this._int32Array, 0);
                 break;
             }
@@ -100,37 +138,13 @@ export class Semaphore {
     }
 
     /**
-     * Acquires a given number of permits from the semaphore. Calls to the function do not block like calls to {@link Semaphore.acquire acquire} but immediately return with a promise. The promise resolves once all permis a available and acquired.
+     * Creates a new `Semaphore` instance from a `SharedArrayBuffer`.
+     * The buffer must contain a single 32-bit integer (4 bytes).
      * 
-     * This should be used in favor of {@link Semaphore.acquire acquire} if Atomics.wait is not available (eg. on the main thread).
-     * 
-     * @param num Number of permits to acquire.
-     * @returns {Promise<void>} A promise that resolves once all permits are acquired. 
+     * @param buffer A `SharedArrayBuffer` with 4 bytes.
+     * @returns A new `Semaphore` instance using the given shared buffer.
      */
-    public async acquireAsync(num = 1): Promise<void> {
-        while (true) {
-            const available = Atomics.load(this._int32Array, 0);
-            if (available < num) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await (Atomics as any).waitAsync(this._int32Array, 0, available).value; // wait untill the value changes
-                continue; // and try again
-            }
-
-            if (Atomics.compareExchange(this._int32Array, 0, available, available - num) === available) {
-                this._acquiredPermits += num;
-                break;
-            }
-        }
-    }
-
-    /**
-     * Creates a new Semaphore initially holding the specified number of permits.
-     * @param capacity Intially availabe number of permits
-     * @returns {Semaphore}
-     */
-    public static createWithCapacity(capacity: number): Semaphore {
-        const sab = new SharedArrayBuffer(4);
-        new DataView(sab).setInt32(0, capacity, true);
-        return new Semaphore(new Int32Array(sab));
+    public static on(buffer: SharedArrayBuffer): Semaphore {
+        return new Semaphore(new Int32Array(buffer));
     }
 }

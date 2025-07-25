@@ -1,8 +1,10 @@
 {
     "compilerOptions": {
-        "module": "ES2020",
-        "target": "ES2021",
+        "module": "es6",
+        "target": "es2024",
         "noImplicitAny": true,
+        "strictNullChecks": true,
+        "strictPropertyInitialization": true,
         "removeComments": false,
         "preserveConstEnums": true,
         "sourceMap": true,
