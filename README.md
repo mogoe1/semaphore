@@ -2,9 +2,11 @@
 A semaphore designed for multi-threaded browser environments.
 
 ## Installing
-<strike> `npm install @mogoe1/semaphore` </strike> (we are not on npm yet)
 
-	npm install --save git+https://github.com/mogoe1/semaphore.git
+	bun add github:mogoe1/semaphore
+
+## Development
+Install dependencies with `bun install`, then run `bun run build`, `bun run lint`, and `bun run format:check`.
 
 ## Notes
 * The implementation relies on SharedArrayBuffers. Make sure your site meets the [security requirements](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer#security_requirements).
@@ -40,6 +42,3 @@ self.addEventListener("message", message => {
     sem.release(1);
 });
 ```
-
-## Docs
-Docs are availabe at https://mogoe1.github.io/semaphore/index.html.

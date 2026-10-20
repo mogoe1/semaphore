@@ -1,0 +1,14 @@
+{
+    "$schema": "./node_modules/oxlint/configuration_schema.json",
+    "categories": {
+        "correctness": "error",
+        "suspicious": "error"
+    },
+    "rules": {
+        "eslint/no-await-in-loop": "off",
+        "eslint/no-underscore-dangle": "off",
+        "no-useless-return": "warn",
+        "prefer-template": "error",
+        "typescript/no-explicit-any": "error"
+    }
+}
