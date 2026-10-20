@@ -3,10 +3,16 @@ A semaphore designed for multi-threaded browser environments.
 
 ## Installing
 
-	bun add github:mogoe1/semaphore
+	bun add github:mogoe1/semaphore#<tag>
+
+Replace the tag with the version you want, see [Releases](https://github.com/mogoe1/semaphore/releases). Tags contain the built `lib/` folder; the `main` branch does not.
 
 ## Development
 Install dependencies with `bun install`, then run `bun run build`, `bun run lint`, and `bun run format:check`.
+
+## Releasing
+1. Bump `version` in `package.json` and merge it to `main`.
+2. Run the **Release** workflow on `main` (Actions tab). It checks the code, builds `lib/`, pushes the tag `v<version>` with the build output and creates a GitHub release.
 
 ## Notes
 * The implementation relies on SharedArrayBuffers. Make sure your site meets the [security requirements](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer#security_requirements).
