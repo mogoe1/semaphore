@@ -3,14 +3,24 @@
   "version": "0.2.0",
   "description": "A semaphore designed for multithreaded browser environments",
   "packageManager": "bun@1.4.3",
-  "main": "lib/Semaphore.js",
-  "types": "lib/Semaphore.d.ts",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./lib/Semaphore.js",
+  "types": "./lib/Semaphore.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/Semaphore.d.ts",
+      "default": "./lib/Semaphore.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "build": "tsc",
     "lint": "oxlint ./src",
     "lint:fix": "oxlint --fix ./src",
     "format": "oxfmt ./src",
     "format:check": "oxfmt --check ./src",
+    "check:package": "publint && attw --profile esm-only $(bun pm pack --quiet --destination ./node_modules/.cache | tail -1)",
     "prepublishOnly": "bun run build"
   },
   "repository": {
@@ -32,8 +42,10 @@
   },
   "homepage": "https://github.com/mogoe1/semaphore#readme",
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "oxfmt": "^0.73.0",
     "oxlint": "^1.88.0",
+    "publint": "^0.3.25",
     "typescript": "^7.0.2"
   },
   "files": [
