@@ -16,10 +16,11 @@
   },
   "scripts": {
     "build": "tsc",
-    "lint": "oxlint ./src",
-    "lint:fix": "oxlint --fix ./src",
-    "format": "oxfmt ./src",
-    "format:check": "oxfmt --check ./src",
+    "lint": "oxlint ./src ./test",
+    "lint:fix": "oxlint --fix ./src ./test",
+    "format": "oxfmt ./src ./test",
+    "format:check": "oxfmt --check ./src ./test",
+    "test": "bun test",
     "check:package": "publint && attw --profile esm-only $(bun pm pack --quiet --destination ./node_modules/.cache | tail -1)",
     "prepublishOnly": "bun run build"
   },
