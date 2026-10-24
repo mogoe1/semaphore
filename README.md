@@ -7,6 +7,10 @@ A semaphore designed for multi-threaded browser environments.
 
 Replace the tag with the version you want, see [Releases](https://github.com/mogoe1/semaphore/releases). Tags contain the built `lib/` folder; the `main` branch does not.
 
+The package is ESM only:
+
+	import { Semaphore } from "@mogoe1/semaphore";
+
 ## Development
 Install dependencies with `bun install`, then run `bun run build`, `bun run lint`, and `bun run format:check`.
 
