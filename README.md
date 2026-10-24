@@ -12,7 +12,7 @@ The package is ESM only:
 	import { Semaphore } from "@mogoe1/semaphore";
 
 ## Development
-Install dependencies with `bun install`, then run `bun run build`, `bun run lint`, and `bun run format:check`.
+Install dependencies with `bun install`, then run `bun run typecheck`, `bun run test`, `bun run lint`, `bun run format:check`, and `bun run build`.
 
 ## Releasing
 1. Bump `version` in `package.json` and merge it to `main`.

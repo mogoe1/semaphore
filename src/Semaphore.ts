@@ -1,3 +1,11 @@
+const MAX_PERMITS = 0x7fffffff;
+
+function validatePermitCount(num: number, parameterName: string): void {
+    if (!Number.isInteger(num) || num <= 0 || num > MAX_PERMITS) {
+        throw new RangeError(`${parameterName} must be a positive 32-bit integer`);
+    }
+}
+
 /**
  * Conceptually a smaphore can be used to manage a set of permits across different thrads.
  * The semaphore keeps track of how many permits are available. Each call to {@link Semaphore.acquire acquire()} blocks untill enough permits are available and takes all at once.
@@ -61,9 +69,7 @@ export class Semaphore {
      * @param num Number of permits to acquire.
      */
     public acquire(num = 1): void {
-        if (num <= 0) {
-            throw new Error("num may not be equal to or less than zero");
-        }
+        validatePermitCount(num, "num");
 
         while (true) {
             const available = Atomics.load(this._int32Array, 0);
@@ -88,6 +94,8 @@ export class Semaphore {
      * @param num Number of permits to release
      */
     public release(num = 1): void {
+        validatePermitCount(num, "num");
+
         if (num > this._acquiredPermits) {
             throw new Error("Amount to release is greater than the amount acquired");
         }
@@ -114,6 +122,8 @@ export class Semaphore {
      * @returns {Promise<void>} A promise that resolves once all permits are acquired.
      */
     public async acquireAsync(num = 1): Promise<void> {
+        validatePermitCount(num, "num");
+
         while (true) {
             const available = Atomics.load(this._int32Array, 0);
             if (available < num) {
@@ -138,6 +148,10 @@ export class Semaphore {
      * @returns {Semaphore}
      */
     public static createWithCapacity(capacity: number): Semaphore {
+        if (!Number.isInteger(capacity) || capacity < 0 || capacity > MAX_PERMITS) {
+            throw new RangeError(`capacity must be a non-negative 32-bit integer`);
+        }
+
         const sab = new SharedArrayBuffer(4);
         new DataView(sab).setInt32(0, capacity, true);
         return new Semaphore(new Int32Array(sab));
