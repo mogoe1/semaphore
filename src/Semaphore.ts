@@ -1,8 +1,8 @@
 const MAX_PERMITS = 0x7fffffff;
 
-function validatePermitCount(num: number, name: string): void {
+function validatePermitCount(num: number, parameterName: string): void {
     if (!Number.isInteger(num) || num <= 0 || num > MAX_PERMITS) {
-        throw new RangeError(`${name} must be a positive 32-bit integer`);
+        throw new RangeError(`${parameterName} must be a positive 32-bit integer`);
     }
 }
 
