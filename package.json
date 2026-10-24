@@ -2,7 +2,7 @@
   "name": "@mogoe1/semaphore",
   "version": "0.2.0",
   "description": "A semaphore designed for multithreaded browser environments",
-  "packageManager": "bun@1.4.3",
+  "packageManager": "bun@1.4.4",
   "type": "module",
   "sideEffects": false,
   "main": "./lib/Semaphore.js",
@@ -18,8 +18,8 @@
     "build": "tsc",
     "lint": "oxlint ./src ./test",
     "lint:fix": "oxlint --fix ./src ./test",
-    "format": "oxfmt ./src ./test",
-    "format:check": "oxfmt --check ./src ./test",
+    "format": "bun fmt ./src ./test",
+    "format:check": "bun fmt --check ./src ./test",
     "test": "bun test",
     "typecheck": "tsc -p test",
     "check:package": "publint && attw --profile esm-only $(bun pm pack --quiet --destination ./node_modules/.cache | tail -1)",
@@ -46,7 +46,6 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
     "@types/bun": "^1.4.4",
-    "oxfmt": "^0.73.0",
     "oxlint": "^1.88.0",
     "publint": "^0.3.25",
     "typescript": "^7.0.2"
