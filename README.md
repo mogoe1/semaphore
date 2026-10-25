@@ -29,7 +29,7 @@ The following example shows how a samaphore can be used to make sure only one th
 // file: main.js
 import { Semaphore } from "@mogoe1/semaphore";
 
-const sem = Semaphore.createWithCapacity(1);
+const sem = Semaphore.createWithInitialCapacity(1);
 const worker = new Worker("worker.js", {type: "module"});
 
 worker.postMessage(sem.buffer);
