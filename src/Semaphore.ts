@@ -16,11 +16,6 @@ function validatePermitCount(num: number, parameterName: string): void {
  */
 export class Semaphore {
     /**
-     * Number of permits accuired by this instance.
-     */
-    private _acquiredPermits: number;
-
-    /**
      * The typed array which holds the number of availabe permits.
      */
     private _int32Array: Int32Array;
@@ -38,15 +33,7 @@ export class Semaphore {
             throw new Error(`${int32Array} does not have length 1`);
         }
 
-        this._acquiredPermits = 0;
         this._int32Array = int32Array;
-    }
-
-    /**
-     * Number of permits acquired by this instance.
-     */
-    public get acquiredPermits(): number {
-        return this._acquiredPermits;
     }
 
     /**
@@ -82,7 +69,6 @@ export class Semaphore {
                 Atomics.compareExchange(this._int32Array, 0, available, available - num) ===
                 available
             ) {
-                this._acquiredPermits += num;
                 break;
             }
         }
@@ -90,23 +76,23 @@ export class Semaphore {
 
     /**
      * Releases the given number of permits and returns them to the semaphore. It automatically notifies blocked {@link Semaphore.acquire acuire()} and pending {@link Semaphore.acquireAsync acquireAsync()} calls.
+     * Permits can be released by any thread; the caller does not need to have acquired them.
      *
      * @param num Number of permits to release
      */
     public release(num = 1): void {
         validatePermitCount(num, "num");
 
-        if (num > this._acquiredPermits) {
-            throw new Error("Amount to release is greater than the amount acquired");
-        }
-
         while (true) {
             const available = Atomics.load(this._int32Array, 0);
+            if (available > MAX_PERMITS - num) {
+                throw new RangeError("Releasing permits would exceed the maximum permit count");
+            }
+
             if (
                 Atomics.compareExchange(this._int32Array, 0, available, available + num) ===
                 available
             ) {
-                this._acquiredPermits -= num;
                 Atomics.notify(this._int32Array, 0);
                 break;
             }
@@ -136,7 +122,6 @@ export class Semaphore {
                 Atomics.compareExchange(this._int32Array, 0, available, available - num) ===
                 available
             ) {
-                this._acquiredPermits += num;
                 break;
             }
         }
@@ -144,10 +129,10 @@ export class Semaphore {
 
     /**
      * Creates a new Semaphore initially holding the specified number of permits.
-     * @param capacity Intially availabe number of permits
+     * @param capacity Initially available number of permits
      * @returns {Semaphore}
      */
-    public static createWithCapacity(capacity: number): Semaphore {
+    public static createWithInitialCapacity(capacity: number): Semaphore {
         if (!Number.isInteger(capacity) || capacity < 0 || capacity > MAX_PERMITS) {
             throw new RangeError(`capacity must be a non-negative 32-bit integer`);
         }

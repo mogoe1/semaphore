@@ -1,7 +1,7 @@
 // file: main.js
 import { Semaphore } from "../lib/Semaphore.js";
 
-const sem = Semaphore.createWithCapacity(1);
+const sem = Semaphore.createWithInitialCapacity(1);
 const worker = new Worker("worker.js", { type: "module" });
 
 worker.postMessage(sem.buffer);
