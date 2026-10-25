@@ -1,6 +1,6 @@
 {
   "name": "@mogoe1/semaphore",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A semaphore designed for multithreaded browser environments",
   "packageManager": "bun@1.4.4",
   "type": "module",
