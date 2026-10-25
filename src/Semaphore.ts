@@ -7,23 +7,23 @@ function validatePermitCount(num: number, parameterName: string): void {
 }
 
 /**
- * Conceptually a smaphore can be used to manage a set of permits across different thrads.
- * The semaphore keeps track of how many permits are available. Each call to {@link Semaphore.acquire acquire()} blocks untill enough permits are available and takes all at once.
+ * Conceptually a semaphore can be used to manage a set of permits across different threads.
+ * The semaphore keeps track of how many permits are available. Each call to {@link Semaphore.acquire acquire()} blocks until enough permits are available and takes all at once.
  * No longer needed permits can be released by calling {@link Semaphore.release release()}. This notifies blocked {@link Semaphore.acquire acquire()} calls.
  *
- * This implementation uses Atomics and a SharedArrayBuffer which holds the number of availabe permits.
+ * This implementation uses Atomics and a SharedArrayBuffer which holds the number of available permits.
  * To use a semaphore across multiple WebWorkers the SharedArrayBuffer can be shared to the Worker instances.
  */
 export class Semaphore {
     /**
-     * The typed array which holds the number of availabe permits.
+     * The typed array which holds the number of available permits.
      */
     private _int32Array: Int32Array;
 
     /**
-     * Creates a new semaphore object. The given Int32Array should be based on a SharedArrayBuffer, have length one and hold the number of currently availaber permits.
+     * Creates a new semaphore object. The given Int32Array should be based on a SharedArrayBuffer, have length one and hold the number of currently available permits.
      *
-     * @param int32Array The typed array which holds the number of availabe permits. It has to have length of one and it has to be based on a SharedArrayBuffer.
+     * @param int32Array The typed array which holds the number of available permits. It has to have length of one and it has to be based on a SharedArrayBuffer.
      */
     constructor(int32Array: Int32Array) {
         if (!(int32Array.buffer instanceof SharedArrayBuffer)) {
@@ -51,7 +51,7 @@ export class Semaphore {
     }
 
     /**
-     * Acquires a given number of permits from the semaphore. The call blocks untill enough permits are available and acquires all at once.
+     * Acquires a given number of permits from the semaphore. The call blocks until enough permits are available and acquires all at once.
      *
      * @param num Number of permits to acquire.
      */
@@ -61,7 +61,7 @@ export class Semaphore {
         while (true) {
             const available = Atomics.load(this._int32Array, 0);
             if (available < num) {
-                Atomics.wait(this._int32Array, 0, available); // wait untill the value changes
+                Atomics.wait(this._int32Array, 0, available); // wait until the value changes
                 continue; // and try again
             }
 
@@ -75,7 +75,7 @@ export class Semaphore {
     }
 
     /**
-     * Releases the given number of permits and returns them to the semaphore. It automatically notifies blocked {@link Semaphore.acquire acuire()} and pending {@link Semaphore.acquireAsync acquireAsync()} calls.
+     * Releases the given number of permits and returns them to the semaphore. It automatically notifies blocked {@link Semaphore.acquire acquire()} and pending {@link Semaphore.acquireAsync acquireAsync()} calls.
      * Permits can be released by any thread; the caller does not need to have acquired them.
      *
      * @param num Number of permits to release
@@ -100,7 +100,7 @@ export class Semaphore {
     }
 
     /**
-     * Acquires a given number of permits from the semaphore. Calls to the function do not block like calls to {@link Semaphore.acquire acquire} but immediately return with a promise. The promise resolves once all permis a available and acquired.
+     * Acquires a given number of permits from the semaphore. Calls to the function do not block like calls to {@link Semaphore.acquire acquire} but immediately return with a promise. The promise resolves once all permits are available and acquired.
      *
      * This should be used in favor of {@link Semaphore.acquire acquire} if Atomics.wait is not available (eg. on the main thread).
      *
@@ -114,7 +114,7 @@ export class Semaphore {
             const available = Atomics.load(this._int32Array, 0);
             if (available < num) {
                 // oxlint-disable-next-line typescript/no-explicit-any
-                await (Atomics as any).waitAsync(this._int32Array, 0, available).value; // wait untill the value changes
+                await (Atomics as any).waitAsync(this._int32Array, 0, available).value; // wait until the value changes
                 continue; // and try again
             }
 
