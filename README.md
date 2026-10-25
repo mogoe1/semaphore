@@ -3,6 +3,8 @@ A semaphore designed for multi-threaded browser environments.
 
 ## Installing
 
+The library is not yet published to npm, so it cannot be installed with `npm install @mogoe1/semaphore`.
+
 	bun add github:mogoe1/semaphore#<tag>
 
 Replace the tag with the version you want, see [Releases](https://github.com/mogoe1/semaphore/releases). Tags contain the built `lib/` folder; the `main` branch does not.
@@ -20,10 +22,10 @@ Install dependencies with `bun install`, then run `bun run typecheck`, `bun run 
 
 ## Notes
 * The implementation relies on SharedArrayBuffers. Make sure your site meets the [security requirements](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer#security_requirements).
-* The implementation relies on Atomics.waitAsync which is implemented by [v8](https://v8.dev/features/atomics) but not documented at mdn yet. You might want to proivide a [polyfill](https://github.com/tc39/proposal-atomics-wait-async/blob/master/polyfill.js).
+* The semaphore does not guarantee fairness or FIFO ordering. Waiting calls are not necessarily served in the order in which they started waiting.
 
 ## Quickstart
-The following example shows how a samaphore can be used to make sure only one thrad at a time has access to a shared ressource.
+The following example shows how a semaphore can be used to make sure only one thread at a time has access to a shared resource.
 
 ```js
 // file: main.js
@@ -47,7 +49,7 @@ import { Semaphore } from "@mogoe1/semaphore";
 self.addEventListener("message", message => {
     const buffer = message.data;
     const sem = new Semaphore(new Int32Array(buffer));
-    sem.acquire(1); // this blocks the worker thread untill one permit is acquired!
+    sem.acquire(1); // this blocks the worker thread until one permit is acquired!
     // exclusive access to resource
     sem.release(1);
 });
